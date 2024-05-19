@@ -39,6 +39,7 @@ def token_analysis(tokenReceiveCache, e):
             # 将初始状态S0和终结符token压入栈
             state_stack = [item_closure_list[0]]
             token_or_var_stack = [(EOF_TOKEN_CATEGORY, 0)]
+            o.writelines(f'{item} ' for item in write_stack(token_or_var_stack))
             # 读取输入缓冲区的第一个token
             token = tokenReceiveCache.gettoken()
             while True:
