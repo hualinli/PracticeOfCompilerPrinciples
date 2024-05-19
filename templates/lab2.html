@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lab2 Parser</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .container {
+            /* max-width: 1200px; */
+            margin: 0 auto;
+            padding: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .file-upload {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .file-upload input[type="file"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .file-upload input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .output-container {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .output-container h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .output-container pre,
+        .output-container ul {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .output-container li {
+            margin-bottom: 10px;
+        }
+
+        .delete-files {
+            display: flex;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        .delete-files input[type="submit"] {
+            background-color: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .download-buttons {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .download-buttons a {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            text-decoration: none;
+            font-size: 16px;
+            margin: 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Lab2 Parser</h1>
+        <div class="file-upload">
+            <form method="POST" enctype="multipart/form-data">
+                <input type="file" name="code_file">
+                <input type="submit" value="上传">
+            </form>
+        </div>
+        {% if code %}
+        <div class="output-container">
+            <div style="display: flex; justify-content: space-around;">
+                <div>
+                    <h2>Code:</h2>
+                    <pre>{{ code }}</pre>
+                </div>
+                <div>
+                    <h2>Tokens:</h2>
+                    <ul>
+                        {% for token in tokens %}
+                        <li>{{ token }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h2>Behavior:</h2>
+                    <ul>
+                        {% for line in behavior %}
+                        <li>{{ line }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                <div>
+                    <h2>Symbol Stack:</h2>
+                    <ul>
+                        {% for line in symbol_stack %}
+                        <li>{{ line }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div>
+                <h2>Error:</h2>
+                <ul>
+                    {% for line in error %}
+                    <li>{{ line }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="download-buttons">
+                <a href="{{ url_for('download', filename='behavior.txt') }}">Download Behavior</a>
+                <a href="{{ url_for('download', filename='output.txt') }}">Download Result</a>
+            </div>
+        </div>
+        <div class="delete-files">
+            <form method="POST" action="{{ url_for('delete_files') }}">
+                <input type="submit" value="Delete All Files">
+            </form>
+        </div>
+        {% endif %}
+</body>
+
+</html>
