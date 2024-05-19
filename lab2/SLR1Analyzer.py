@@ -16,6 +16,8 @@ def write_stack(input_list):
         else:
             output_list.append(item)
     return output_list
+def write_behavior(intput_tuple):
+    return f"{str(intput_tuple[0]).split('.')[-1]} -> {intput_tuple[1]}"
 
 def token_analysis(tokenReceiveCache, e):
     """
@@ -93,13 +95,13 @@ def token_analysis(tokenReceiveCache, e):
                     state_stack.append(item_closure_list[analysis_table.goto[(s.num, production_list[k][0])]])
                     # 将掩盖掉的token值填入产生式，输出填充后的产生式A->beta
                     production = fill_production(production_list[k], pop_token)
-                    b.write("Reduce:{production}\n")
+                    b.write(f"Reduce:{write_behavior(production)}\n")
                     # o.write("Symbol Stack:{token_or_var_stack}\n")
                     o.writelines(f'{item} ' for item in write_stack(token_or_var_stack))
                     o.write("\n")
                 elif analysis_table.action[(s.num, a)] == "acc":
-                    o.write("分析完成!")
+                    o.write("Accept!")
                     return
                 else:
-                    o.write("分析表填写错误!")
+                    o.write("Error!")
                     return

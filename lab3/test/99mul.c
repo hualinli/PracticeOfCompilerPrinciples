@@ -11,5 +11,5 @@ int main(){
         }
         printf("\n");
         i = i +1;
-    }
+    
 }

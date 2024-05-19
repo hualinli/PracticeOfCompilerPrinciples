@@ -175,7 +175,7 @@ class word_list():
                     elif w == kuo_cp[kuo_list[-1]['kuo']]:
                         kuo_list.pop()
                     else:
-                        print("小金提醒：在第" + str(line) + "行的' " + w + " '无法匹配，无法通过编译，请检查代码正确性！")
+                        print("在第" + str(line) + "行的' " + w + " '无法匹配")
                         self.flag = False
                         return
                 self.separator_list.append({'line':line, 'type':'separator', 'word':w})
@@ -193,10 +193,10 @@ class word_list():
                         self.word_list.append({'line':line, 'type':'name', 'word':w, 'id':name_id})
                         name_id += 1
                 else:
-                    print("小金提醒：在第" + str(line) + "行的变量名' " + w + " '不可识别，无法通过编译，请检查代码正确性！")
+                    print("小金提醒：在第" + str(line) + "行的变量名' " + w + " '不可识别")
                     self.flag = False
                     return
         if kuo_list!=[]:
-            print("小金提醒：在第" + str(kuo_list[0]['line']) + "行的' " + kuo_list[0]['kuo'] + " '无法匹配，无法通过编译，请检查代码正确性！")
+            print("第" + str(kuo_list[0]['line']) + "行的' " + kuo_list[0]['kuo'] + " '无法匹配")
             self.flag = False
             return

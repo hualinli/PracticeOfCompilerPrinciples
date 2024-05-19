@@ -1,5 +1,5 @@
 from lexer import if_num
-from LR import analysis
+from lab3.parser import analysis
 from lexer import word_list
 
 operator = {
