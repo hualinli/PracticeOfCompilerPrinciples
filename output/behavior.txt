@@ -1,0 +1,103 @@
+Shift:(116, 'int')
+Reduce:{production}
+Shift:(1, 'main')
+Shift:(25, '(')
+Shift:(26, ')')
+Shift:(29, '{')
+Shift:(116, 'int')
+Reduce:{production}
+Shift:(1, 'a')
+Reduce:{production}
+Shift:(4, ';')
+Reduce:{production}
+Shift:(1, 'a')
+Shift:(1, 'a')
+Shift:(1, 'a')
+Shift:(16, '=')
+Shift:(2, 10.0)
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Shift:(4, ';')
+Reduce:{production}
+Shift:(1, 't')
+Shift:(115, 'if')
+Shift:(25, '(')
+Shift:(1, 'a')
+Reduce:{production}
+Shift:(15, '==')
+Reduce:{production}
+Shift:(2, 10.0)
+Reduce:{production}
+Reduce:{production}
+Shift:(26, ')')
+Shift:(29, '{')
+Shift:(103, 'char')
+Reduce:{production}
+Shift:(1, 'c')
+Reduce:{production}
+Shift:(4, ';')
+Shift:(1, 'c')
+Shift:(16, '=')
+Shift:(5, 'a')
+Reduce:{production}
+Reduce:{production}
+Shift:(4, ';')
+Reduce:{production}
+Shift:(1, 'printf')
+Shift:(25, '(')
+Shift:(6, 'Hello World!%c')
+Reduce:{production}
+Reduce:{production}
+Shift:(24, ',')
+Shift:(1, 'c')
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Shift:(26, ')')
+Reduce:{production}
+Shift:(4, ';')
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Shift:(30, '}')
+Shift:(131, 'while')
+Shift:(25, '(')
+Shift:(1, 'a')
+Reduce:{production}
+Shift:(13, '>=')
+Reduce:{production}
+Shift:(2, 10.0)
+Reduce:{production}
+Reduce:{production}
+Shift:(26, ')')
+Shift:(29, '{')
+Shift:(1, 'printf')
+Shift:(25, '(')
+Shift:(6, 'Hello World!%c')
+Reduce:{production}
+Reduce:{production}
+Shift:(24, ',')
+Shift:(1, 'c')
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Shift:(26, ')')
+Reduce:{production}
+Shift:(4, ';')
+Reduce:{production}
+Shift:(30, '}')
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Reduce:{production}
+Shift:(30, '}')
+Reduce:{production}
+Reduce:{production}
