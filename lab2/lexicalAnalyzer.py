@@ -5,11 +5,13 @@ from .utils import *
 def token_scan(inputCache):
     """
     token解析函数
-    ch: 存放当前读入的输入单词。
-    token: 存放当前解析出的token元组。
-    token在内存中的表示: (类别码，值)
-    :param inputCache:
-    :return:
+    Args:
+        inputCache: 输入缓存对象，用于读取输入字符和记录token信息
+
+    Returns:
+        一个元组，包含token的类别码和值。
+        如果解析过程中发生错误，则返回(UNRECOGNIZED_TOKEN_CATEGORY, inputCache.pop_token())
+        如果读取到文件末尾，返回(EOF_TOKEN_CATEGORY, 0)
     """
     state_now = 0
     # 如果是非终结状态，则继续读取字符进行状态转移

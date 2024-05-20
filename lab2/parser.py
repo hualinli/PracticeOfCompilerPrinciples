@@ -101,4 +101,4 @@ def parser(input_file):
         lexical_analyze(q, input_file, e)
         syntax_analyze(q, e)
 
-# parser('uploads/test.c')
+parser('uploads/test.c')

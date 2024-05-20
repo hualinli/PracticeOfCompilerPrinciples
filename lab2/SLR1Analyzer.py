@@ -1,7 +1,6 @@
 import os
 from .table_generator import item_closure_list, production_list, AnalysisTable, V
-from .utils import EOF, EOF_TOKEN_CATEGORY, fill_production, print_production, CATEGORY_DICT_REVERSE, token2str, \
-    print_item_closure
+from .utils import EOF, EOF_TOKEN_CATEGORY, GrammarVarEnum, fill_production, print_production, CATEGORY_DICT_REVERSE, token2str
 
 def write_stack(input_list):
     output_list = []
@@ -17,7 +16,15 @@ def write_stack(input_list):
             output_list.append(item)
     return output_list
 def write_behavior(intput_tuple):
-    return f"{str(intput_tuple[0]).split('.')[-1]} -> {intput_tuple[1]}"
+    output = f"{str(intput_tuple[0]).split('.')[-1]}" + " -> "
+    for token_or_var in intput_tuple[1]:
+        if isinstance(token_or_var, tuple):
+            output += token2str(token_or_var) + " "
+        elif isinstance(token_or_var, GrammarVarEnum):
+            output += token_or_var.name + " "
+        else:
+            output += "{ERROR}"
+    return output
 
 def token_analysis(tokenReceiveCache, e):
     """
@@ -42,6 +49,7 @@ def token_analysis(tokenReceiveCache, e):
             state_stack = [item_closure_list[0]]
             token_or_var_stack = [(EOF_TOKEN_CATEGORY, 0)]
             o.writelines(f'{item} ' for item in write_stack(token_or_var_stack))
+            o.write("\n")
             # 读取输入缓冲区的第一个token
             token = tokenReceiveCache.gettoken()
             while True:
