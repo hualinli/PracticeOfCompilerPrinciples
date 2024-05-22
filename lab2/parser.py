@@ -104,6 +104,3 @@ def parser(input_file):
         q = queue.Queue()
         lexical_analyze(q, input_file, e)
         syntax_analyze(q, e)
-
-
-parser('uploads/test.c')

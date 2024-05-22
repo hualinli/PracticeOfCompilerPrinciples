@@ -94,14 +94,14 @@ def lab2():
         errors = read_tokens(os.path.join(OUTPUT_DIR, 'error.txt'))
     return render_template('lab2.html', code=codes, tokens=tokens, behavior=behaviors, symbol_stack=symbols, error=errors)
 
-@app.route('/lab3', methods=['GET', 'POST'])
-def lab3():
-    codes = None
-    result_codes = None
-    if request.method == 'POST':
-        code_file = request.files['code_file']
-        code_file.save(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
-    return render_template('lab3.html', codes=codes, result_codes=result_codes)
+# @app.route('/lab3', methods=['GET', 'POST'])
+# def lab3():
+#     codes = None
+#     result_codes = None
+#     if request.method == 'POST':
+#         code_file = request.files['code_file']
+#         code_file.save(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
+#     return render_template('lab3.html', codes=codes, result_codes=result_codes)
 
 if __name__ == '__main__':
     app.run(debug=True)
