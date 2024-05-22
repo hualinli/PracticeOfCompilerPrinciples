@@ -98,7 +98,7 @@ def lab2():
 @app.route('/lab3', methods=['GET', 'POST'])
 def lab3():
     source_code = None
-    codes = None
+    codes = ""
     result = None
     if request.method == 'POST':
         code_file = request.files['code_file']

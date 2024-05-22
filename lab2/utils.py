@@ -102,7 +102,8 @@ CATEGORY_DICT = {
     "while": 131,
     "true": 132,
     "false": 133,
-    "string": 134
+    "string": 134,
+    "return": 135,
 }
 
 CATEGORY_DICT_REVERSE = dict((v, k) for k, v in CATEGORY_DICT.items())
@@ -161,6 +162,7 @@ class Grammar(Enum):
     FORM_PARAM = auto()
     REAL_PARAM = auto()
     CONSTANT = auto()
+    RET_VAL = auto()
 
     def __repr__(self):
         return self.name
@@ -173,11 +175,12 @@ initial_production_list = [
     # 程序块->函数定义|变量声明 分号|程序块 程序块
     (Grammar.PROG_BLOCK, [[Grammar.FUNC_DEF], [Grammar.VAR_DECLARE, (SPLIT, 0)],
                           [Grammar.PROG_BLOCK, Grammar.PROG_BLOCK]]),
-    # 函数定义->类型 标识符 左括号 形式参数 右括号 左大括号 函数块 右大括号|类型 标识符 左括号 右括号 左大括号 函数块 右大括号
+    # 函数定义->类型 标识符 左括号 形式参数 右括号 左大括号 函数块 返回值 右大括号|类型 标识符 左括号 右括号 左大括号 函数块 右大括号
     (Grammar.FUNC_DEF, [
         [Grammar.TYPE, (IDENTIFIER, 0), (25, 0), Grammar.FORM_PARAM, (26, 0), (29, 0),
-         Grammar.FUNC, (30, 0)],
+         Grammar.FUNC, Grammar.RET_VAL, (30, 0)],
         [Grammar.TYPE, (IDENTIFIER, 0), (25, 0), (26, 0), (29, 0), Grammar.FUNC, (30, 0)]]),
+    (Grammar.RET_VAL, [[(135, 0), Grammar.VALUE, (4, 0)]]),
     # 变量声明->类型 标识符
     (Grammar.VAR_DECLARE, [[Grammar.TYPE, (IDENTIFIER, 0)]]),
     # 形式参数->类型 标识符|类型 标识符 逗号 形式参数

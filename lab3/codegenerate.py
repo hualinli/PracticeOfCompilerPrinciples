@@ -286,8 +286,7 @@ class SemanticAnalyzer:
         self.start = 'Program'
         self.productions = {
             'Program': [['Function']],
-            'Parameter': [['DataType', '0', 'Action:allocateParam', '123', 'Parameter_'], ['46']],
-            'Parameter_': [['Parameter'], ['null']],
+            'Parameter': [['DataType', '0', 'Action:allocateParam'], ['46']],
             'Action:allocateParam': [['null', 'do:allocateParam']],
             'ReturnType': [['2', 'do:passReturnType'], ['13', 'do:passReturnType'], ['24', 'do:passReturnType'],
                            ['46', 'do:passReturnType']],
@@ -298,7 +297,7 @@ class SemanticAnalyzer:
             'Action:allocateFunc': [['null', 'do:allocateFunc']],
             'Function_': [['Function'], ['null']],
             'FunctionBody': [['VariableDef', 'ProcessStc', 'ReturnStc']],
-            'ReturnStc': [['33', '0', '124', 'do:returnVariable'], ['33', 'Num', '124', 'do:returnNum']],
+            'ReturnStc': [['33', '0', '124', 'do:returnVariable'], ['33', 'Num', '124', 'do:returnNum'], ['null']],
             'VariableDef': [['DataType', '0', 'Action:allocateVar', '124', 'VariableDef_']],
             'Action:allocateVar': [['null', 'do:allocateVar']],
             'VariableDef_': [['VariableDef'], ['null']],
