@@ -1,9 +1,5 @@
-import os
-import re
-
 from functools import reduce
-from .utils import initial_production_list, EMPTY_TOKEN, EOF_TOKEN_CATEGORY, GrammarVarEnum, print_first_or_follow, \
-    print_item_closure, CATEGORY_DICT_REVERSE, print_action_or_goto
+from .utils import initial_production_list, EMPTY_TOKEN, EOF_TOKEN_CATEGORY, Grammar, CATEGORY_DICT_REVERSE
 
 production_list = []
 # 获取产生式列表，将initial_production_list中多个右部合写的产生式拆解为多个单右部的产生式
@@ -77,7 +73,7 @@ class AnalysisTable:
         # print_first_or_follow(first, "FIRST")
         # 求文法变量的FOLLOW集
         # 将终止符token加入初始符号的follow集
-        self.follow[GrammarVarEnum.ROOT] = {(EOF_TOKEN_CATEGORY, 0)}
+        self.follow[Grammar.ROOT] = {(EOF_TOKEN_CATEGORY, 0)}
         flag = True
         # 不断扩展FOLLOW集直到所有文法变量的FOLLOW集都不变为止
         while flag:
@@ -124,7 +120,7 @@ class AnalysisTable:
             # 对于项目集规范族中的每一个状态(闭包)构造分析表
             k = item_closure.num
             for item in item_closure.closure_list:
-                if item.left == GrammarVarEnum.ROOT and item.is_reduce():
+                if item.left == Grammar.ROOT and item.is_reduce():
                     # 规范族中存在归约项目S'->S, 置接收终止符的动作为分析完成
                     self.action[(k, (EOF_TOKEN_CATEGORY, 0))] = "acc"
                 elif item.is_reduce():
@@ -253,7 +249,7 @@ class Item:
             token_or_var = self.right[i]
             if isinstance(token_or_var, tuple):
                 output += CATEGORY_DICT_REVERSE[token_or_var[0]] + " "
-            elif isinstance(token_or_var, GrammarVarEnum):
+            elif isinstance(token_or_var, Grammar):
                 output += token_or_var.name + " "
             else:
                 output += "{ERROR} "

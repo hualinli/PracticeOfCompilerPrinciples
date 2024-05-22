@@ -143,7 +143,7 @@ CHARSET_FUNC_DICT = {
 # 语法分析器
 # 文法变量
 @unique
-class GrammarVarEnum(Enum):
+class Grammar(Enum):
     ROOT = auto()  # S'
     PROG_BLOCK = auto()  # S
     FUNC_DEF = auto()
@@ -169,61 +169,61 @@ class GrammarVarEnum(Enum):
 # 产生式列表
 initial_production_list = [
     # 程序->程序块
-    (GrammarVarEnum.ROOT, [[GrammarVarEnum.PROG_BLOCK]]),
+    (Grammar.ROOT, [[Grammar.PROG_BLOCK]]),
     # 程序块->函数定义|变量声明 分号|程序块 程序块
-    (GrammarVarEnum.PROG_BLOCK, [[GrammarVarEnum.FUNC_DEF], [GrammarVarEnum.VAR_DECLARE, (SPLIT, 0)],
-                                 [GrammarVarEnum.PROG_BLOCK, GrammarVarEnum.PROG_BLOCK]]),
+    (Grammar.PROG_BLOCK, [[Grammar.FUNC_DEF], [Grammar.VAR_DECLARE, (SPLIT, 0)],
+                          [Grammar.PROG_BLOCK, Grammar.PROG_BLOCK]]),
     # 函数定义->类型 标识符 左括号 形式参数 右括号 左大括号 函数块 右大括号|类型 标识符 左括号 右括号 左大括号 函数块 右大括号
-    (GrammarVarEnum.FUNC_DEF, [
-        [GrammarVarEnum.TYPE, (IDENTIFIER, 0), (25, 0), GrammarVarEnum.FORM_PARAM, (26, 0), (29, 0),
-         GrammarVarEnum.FUNC, (30, 0)],
-        [GrammarVarEnum.TYPE, (IDENTIFIER, 0), (25, 0), (26, 0), (29, 0), GrammarVarEnum.FUNC, (30, 0)]]),
+    (Grammar.FUNC_DEF, [
+        [Grammar.TYPE, (IDENTIFIER, 0), (25, 0), Grammar.FORM_PARAM, (26, 0), (29, 0),
+         Grammar.FUNC, (30, 0)],
+        [Grammar.TYPE, (IDENTIFIER, 0), (25, 0), (26, 0), (29, 0), Grammar.FUNC, (30, 0)]]),
     # 变量声明->类型 标识符
-    (GrammarVarEnum.VAR_DECLARE, [[GrammarVarEnum.TYPE, (IDENTIFIER, 0)]]),
+    (Grammar.VAR_DECLARE, [[Grammar.TYPE, (IDENTIFIER, 0)]]),
     # 形式参数->类型 标识符|类型 标识符 逗号 形式参数
-    (GrammarVarEnum.FORM_PARAM, [[GrammarVarEnum.TYPE, (IDENTIFIER, 0)],
-                                 [GrammarVarEnum.TYPE, (IDENTIFIER, 0), (24, 0), GrammarVarEnum.FORM_PARAM]]),
+    (Grammar.FORM_PARAM, [[Grammar.TYPE, (IDENTIFIER, 0)],
+                          [Grammar.TYPE, (IDENTIFIER, 0), (24, 0), Grammar.FORM_PARAM]]),
     # 函数块->变量声明 分号|变量赋值 分号|函数调用 分号|循环结构|分支结构|函数块 函数块
-    (GrammarVarEnum.FUNC, [[GrammarVarEnum.VAR_DECLARE, (SPLIT, 0)], [GrammarVarEnum.VAR_ASSIGN, (SPLIT, 0)],
-                                 [GrammarVarEnum.FUNC_CALL, (SPLIT, 0)], [GrammarVarEnum.LOOP], [GrammarVarEnum.BRANCH],
-                                 [GrammarVarEnum.FUNC, GrammarVarEnum.FUNC]]),
+    (Grammar.FUNC, [[Grammar.VAR_DECLARE, (SPLIT, 0)], [Grammar.VAR_ASSIGN, (SPLIT, 0)],
+                    [Grammar.FUNC_CALL, (SPLIT, 0)], [Grammar.LOOP], [Grammar.BRANCH],
+                    [Grammar.FUNC, Grammar.FUNC]]),
     # 变量赋值->标识符 等号 常量
-    (GrammarVarEnum.VAR_ASSIGN, [[(IDENTIFIER, 0), (16, 0), GrammarVarEnum.CONSTANT]]),
+    (Grammar.VAR_ASSIGN, [[(IDENTIFIER, 0), (16, 0), Grammar.CONSTANT]]),
     # 算术表达式->算术表达式 算术运算符 算术表达式|负号 算术表达式|函数调用|左括号 算术表达式 右括号|标识符|整数|实数
-    (GrammarVarEnum.VALUE,
-     [[GrammarVarEnum.VALUE, GrammarVarEnum.CAL_OPT, GrammarVarEnum.VALUE],
-      [(20, 0), GrammarVarEnum.VALUE], [GrammarVarEnum.FUNC_CALL],
-      [(25, 0), GrammarVarEnum.VALUE, (26, 0)], [(IDENTIFIER, 0)], [(INTEGER, 0)], [(REAL_NUMBER, 0)]]),
+    (Grammar.VALUE,
+     [[Grammar.VALUE, Grammar.CAL_OPT, Grammar.VALUE],
+      [(20, 0), Grammar.VALUE], [Grammar.FUNC_CALL],
+      [(25, 0), Grammar.VALUE, (26, 0)], [(IDENTIFIER, 0)], [(INTEGER, 0)], [(REAL_NUMBER, 0)]]),
     # 布尔表达式->算术表达式 比较运算符 算术表达式|布尔表达式 与符号 布尔表达式|布尔表达式 或符号 布尔表达式|非符号 布尔表达式|函数调用|左括号 布尔表达式 右括号|标识符|真|假
-    (GrammarVarEnum.BOOL,
-     [[GrammarVarEnum.VALUE, GrammarVarEnum.CMP_OPT, GrammarVarEnum.VALUE],
-      [GrammarVarEnum.BOOL, (33, 0), GrammarVarEnum.BOOL],
-      [GrammarVarEnum.BOOL, (34, 0), GrammarVarEnum.BOOL],
-      [(18, 0), GrammarVarEnum.BOOL], [GrammarVarEnum.FUNC_CALL],
-      [(25, 0), GrammarVarEnum.BOOL, (26, 0)],  [(132, 0)], [(133, 0)]]),
+    (Grammar.BOOL,
+     [[Grammar.VALUE, Grammar.CMP_OPT, Grammar.VALUE],
+      [Grammar.BOOL, (33, 0), Grammar.BOOL],
+      [Grammar.BOOL, (34, 0), Grammar.BOOL],
+      [(18, 0), Grammar.BOOL], [Grammar.FUNC_CALL],
+      [(25, 0), Grammar.BOOL, (26, 0)], [(132, 0)], [(133, 0)]]),
     # 函数调用->标识符 左括号 实际参数 右括号|标识符 左括号 右括号
-    (GrammarVarEnum.FUNC_CALL,
-     [[(IDENTIFIER, 0), (25, 0), GrammarVarEnum.REAL_PARAM, (26, 0)], [(IDENTIFIER, 0), (25, 0), (26, 0)]]),
+    (Grammar.FUNC_CALL,
+     [[(IDENTIFIER, 0), (25, 0), Grammar.REAL_PARAM, (26, 0)], [(IDENTIFIER, 0), (25, 0), (26, 0)]]),
     # 实际参数->标识符|实际参数->常量|实际参数 逗号 实际参数|
-    (GrammarVarEnum.REAL_PARAM,
-     [[(IDENTIFIER, 0)], [GrammarVarEnum.CONSTANT], [GrammarVarEnum.REAL_PARAM, (24, 0), GrammarVarEnum.REAL_PARAM]]),
+    (Grammar.REAL_PARAM,
+     [[(IDENTIFIER, 0)], [Grammar.CONSTANT], [Grammar.REAL_PARAM, (24, 0), Grammar.REAL_PARAM]]),
     # 循环结构->关揵字while 左括号 布尔表达式 右括号 左大括号 函数块 右大括号
-    (GrammarVarEnum.LOOP,
-     [[(131, 0), (25, 0), GrammarVarEnum.BOOL, (26, 0), (29, 0), GrammarVarEnum.FUNC, (30, 0)]]),
+    (Grammar.LOOP,
+     [[(131, 0), (25, 0), Grammar.BOOL, (26, 0), (29, 0), Grammar.FUNC, (30, 0)]]),
     # 分支结构->关键字if 左括号 布尔表达式 右括号 左大括号 函数块 右大括号|关键字if 左括号 布尔表达式 右括号 左大括号 函数块 右大括号 关键字else 左大括号 函数块 右大括号
-    (GrammarVarEnum.BRANCH,
-     [[(115, 0), (25, 0), GrammarVarEnum.BOOL, (26, 0), (29, 0), GrammarVarEnum.FUNC, (30, 0)],
-      [(115, 0), (25, 0), GrammarVarEnum.BOOL, (26, 0), (29, 0), GrammarVarEnum.FUNC, (30, 0),
-       (109, 0), (29, 0), GrammarVarEnum.FUNC, (30, 0)]]),
+    (Grammar.BRANCH,
+     [[(115, 0), (25, 0), Grammar.BOOL, (26, 0), (29, 0), Grammar.FUNC, (30, 0)],
+      [(115, 0), (25, 0), Grammar.BOOL, (26, 0), (29, 0), Grammar.FUNC, (30, 0),
+       (109, 0), (29, 0), Grammar.FUNC, (30, 0)]]),
     # 类型->关联字int|关键字char|关键字string|关键字float
-    (GrammarVarEnum.TYPE, [[(116, 0)], [(103, 0)], [(134, 0)], [(112, 0)]]),
+    (Grammar.TYPE, [[(116, 0)], [(103, 0)], [(134, 0)], [(112, 0)]]),
     # 算术运算符->加号|减号|乘号|除号|百分号
-    (GrammarVarEnum.CAL_OPT, [[(19, 0)], [(20, 0)], [(21, 0)], [(22, 0)], [(23, 0)]]),
+    (Grammar.CAL_OPT, [[(19, 0)], [(20, 0)], [(21, 0)], [(22, 0)], [(23, 0)]]),
     # 比较运算符->大于|小于|等于|大于等于|小于等于|不等于
-    (GrammarVarEnum.CMP_OPT, [[(14, 0)], [(12, 0)], [(15, 0)], [(13, 0)], [(11, 0)], [(17, 0)]]),
+    (Grammar.CMP_OPT, [[(14, 0)], [(12, 0)], [(15, 0)], [(13, 0)], [(11, 0)], [(17, 0)]]),
     # 常量->算术表达式|布尔表达式|整数|实数|字符|字符串
-    (GrammarVarEnum.CONSTANT,
-     [[GrammarVarEnum.VALUE], [GrammarVarEnum.BOOL], [(INTEGER, 0)], [(REAL_NUMBER, 0)],
+    (Grammar.CONSTANT,
+     [[Grammar.VALUE], [Grammar.BOOL], [(INTEGER, 0)], [(REAL_NUMBER, 0)],
       [(CHAR, 0)], [(STRING, 0)]])
 ]
 
@@ -235,7 +235,7 @@ def fill_production(production, pop_token):
 
 def print_first_or_follow(first_or_follow, mode):
     print(mode + "集:")
-    item_list = sorted([item for item in first_or_follow.items() if isinstance(item[0], GrammarVarEnum)],
+    item_list = sorted([item for item in first_or_follow.items() if isinstance(item[0], Grammar)],
                        key=lambda x: x[0].value)
     for key, value in item_list:
         print_value = {CATEGORY_DICT_REVERSE[token[0]] for token in value}
@@ -269,7 +269,7 @@ def print_production(production):
     for token_or_var in production[1]:
         if isinstance(token_or_var, tuple):
             output += token2str(token_or_var) + " "
-        elif isinstance(token_or_var, GrammarVarEnum):
+        elif isinstance(token_or_var, Grammar):
             output += token_or_var.name + " "
         else:
             output += "{ERROR} "

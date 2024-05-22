@@ -1,6 +1,6 @@
 import os
 from .table_generator import item_closure_list, production_list, AnalysisTable, V
-from .utils import EOF, EOF_TOKEN_CATEGORY, GrammarVarEnum, fill_production, print_production, CATEGORY_DICT_REVERSE, token2str
+from .utils import EOF, EOF_TOKEN_CATEGORY, Grammar, fill_production, print_production, CATEGORY_DICT_REVERSE, token2str
 
 def write_stack(input_list):
     output_list = []
@@ -20,7 +20,7 @@ def write_behavior(intput_tuple):
     for token_or_var in intput_tuple[1]:
         if isinstance(token_or_var, tuple):
             output += token2str(token_or_var) + " "
-        elif isinstance(token_or_var, GrammarVarEnum):
+        elif isinstance(token_or_var, Grammar):
             output += token_or_var.name + " "
         else:
             output += "{ERROR}"

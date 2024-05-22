@@ -3,12 +3,15 @@ import queue
 from .utils import *
 from .SLR1Analyzer import *
 from .lexicalAnalyzer import *
+
+
 class TokenReceiveCache:
     """
     token接收缓存
     queue: 需要进行语法分析的token队列
     count: 记录已读入的token数量
     """
+
     def __init__(self, q):
         self.queue = q
         self.count = 0
@@ -16,6 +19,7 @@ class TokenReceiveCache:
     def gettoken(self):
         self.count += 1
         return self.queue.get()
+
 
 class InputCache:
     """
@@ -30,6 +34,7 @@ class InputCache:
     retract(num=1): 将数据缓冲区读入指针向前回退num个字符。
     pop_token(): 返回输入缓冲区开始指针到读入指针之间的字符串，并将开始指针与读入指针放到下一个token的位置。
     """
+
     def __init__(self, file):
         self.__cache = ""
         self.__beginning = 0
@@ -64,13 +69,14 @@ class InputCache:
         self.__forward = self.__beginning
         return token.lstrip()
 
-def lexical_analyze(q,input_file, e):
+
+def lexical_analyze(q, input_file, e):
     inputCache = InputCache(input_file)
     token = token_scan(inputCache)
     # 读入token直到到达文件末尾
     output_dir = os.path.join(os.getcwd(), 'output')
     os.makedirs(output_dir, exist_ok=True)
-    
+
     token_file = os.path.join(output_dir, 'tokens.txt')
     with open(token_file, 'w') as f:
         while token[0] != EOF_TOKEN_CATEGORY:
@@ -100,5 +106,6 @@ def parser(input_file):
         q = queue.Queue()
         lexical_analyze(q, input_file, e)
         syntax_analyze(q, e)
+
 
 parser('uploads/test.c')
