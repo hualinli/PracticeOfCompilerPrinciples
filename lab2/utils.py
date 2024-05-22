@@ -233,24 +233,6 @@ def fill_production(production, pop_token):
     return filled_production
 
 
-def print_first_or_follow(first_or_follow, mode):
-    print(mode + "集:")
-    item_list = sorted([item for item in first_or_follow.items() if isinstance(item[0], Grammar)],
-                       key=lambda x: x[0].value)
-    for key, value in item_list:
-        print_value = {CATEGORY_DICT_REVERSE[token[0]] for token in value}
-        print(key.name + ': ' + str(print_value))
-
-    print("\n\n----------------------------------------------------------------\n\n")
-
-
-def print_item_closure(item_closure):
-    print("closure(%d):" % item_closure.num)
-    print("item_list:", item_closure.closure_list)
-    print("go_list:",
-          {CATEGORY_DICT_REVERSE[token_or_var[0]] if isinstance(token_or_var, tuple) else token_or_var: s.num for
-           token_or_var, s in item_closure.go.items()})
-
 
 def token2str(token):
     if token[0] in [1, 2, 3]:
@@ -264,25 +246,4 @@ def token2str(token):
     return CATEGORY_DICT_REVERSE[token[0]]
 
 
-def print_production(production):
-    output = str(production[0]) + "->"
-    for token_or_var in production[1]:
-        if isinstance(token_or_var, tuple):
-            output += token2str(token_or_var) + " "
-        elif isinstance(token_or_var, Grammar):
-            output += token_or_var.name + " "
-        else:
-            output += "{ERROR} "
-    print(output)
 
-
-def print_action_or_goto(action, mode):
-    print(mode)
-    data = {'state': [], 'next': [], "value": []}
-    for key, value in action.items():
-        data['state'].append(key[0])
-        data['next'].append(CATEGORY_DICT_REVERSE[key[1][0]] if isinstance(key[1], tuple) else key[1])
-        data['value'].append(value)
-    df = pd.DataFrame(data)
-    print(df)
-    print("\n\n----------------------------------------------------------------\n\n")

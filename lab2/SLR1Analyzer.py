@@ -11,7 +11,7 @@ def write_stack(input_list):
                 output_list.append(f'$')
             else:
                 output_list.append(f'\"{str(item[1])}\"')
-        elif 'GrammarVarEnum.' in str(item):
+        elif 'Grammar.' in str(item):
             output_list.append(str(item).split('.')[-1])
         else:
             output_list.append(item)
@@ -24,7 +24,7 @@ def write_behavior(intput_tuple):
         if isinstance(token_or_var, tuple):
             output += token2str(token_or_var) + " "
         elif isinstance(token_or_var, Grammar):
-            output += token_or_var.name + " "
+            output += token_or_var.name + "  "
         else:
             output += "{ERROR}"
     return output
