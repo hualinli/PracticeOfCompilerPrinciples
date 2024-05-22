@@ -102,11 +102,11 @@
         <div class="output-container">
             <div style="display: flex; justify-content: space-around;">
                 <div>
-                    <h2>Code:</h2>
+                    <h2>Source Code:</h2>
                     <pre>{{ code }}</pre>
                 </div>
                 <div>
-                    <h2>Three Address Code:</h2>
+                    <h2>Intermediate code:</h2>
                     <ul>
                         {% for result_code in result_codes %}
                         <li>{{ result_code }}</li>
@@ -115,7 +115,7 @@
                 </div>
             </div>
             <div class="download-buttons">
-                <a href="{{ url_for('download', filename='result.txt') }}">Download Result</a>
+                <a href="{{ url_for('download', filename='code.txt') }}">Download Code</a>
             </div>
         </div>
         <div class="delete-files">

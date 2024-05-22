@@ -282,8 +282,8 @@ class StackNode:
 
 
 class SemanticAnalyzer:
-    def __init__(self, start, new_start='S', point='.', sharp='$', acc='acc', log_level=0):
-        self.start = start
+    def __init__(self, new_start='S', point='.', sharp='$', acc='acc', log_level=0):
+        self.start = 'Program'
         self.productions = {
             'Program': [['Function']],
             'Parameter': [['DataType', '0', 'Action:allocateParam', '123', 'Parameter_'], ['46']],
@@ -613,7 +613,7 @@ class SemanticAnalyzer:
             if symbol_stack[-12].info.type != symbol_stack[-2].info.type:
                 print('variable type not match')
             else:
-                self.gen_code('return ' + symbol_stack[-2].info.val)
+                self.gen_code('return ' + str(symbol_stack[-2].info.val))
         elif action == 'do:allocateVar':
             name = symbol_stack[-2].symbol[1]
             type = symbol_stack[-3].info.type
@@ -763,12 +763,14 @@ class SemanticAnalyzer:
             self.code[item] += str(addr)
 
     def output_code(self):
+        code = ""
         for i in range(len(self.code)):
-            print(i, ':', self.code[i])
+            code += str(i) + ':' + self.code[i] + '\n'
+        return code
 
 
 if __name__ == '__main__':
-    scanner = LexicalScanner('main.c')
-    analyzer = SemanticAnalyzer('Program')
+    scanner = LexicalScanner('uploads/test.c')
+    analyzer = SemanticAnalyzer()
     print(analyzer.analyze_grammar(scanner.lexical_analysis()))
-    analyzer.output_code()
+    print(analyzer.output_code())
