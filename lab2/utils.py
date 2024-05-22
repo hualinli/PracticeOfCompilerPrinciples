@@ -260,7 +260,7 @@ def token2str(token):
     if token[0] == 5:
         return "'%s'" % token[1]
     if token[0] == 6:
-        return'"%s"' % token[1]
+        return '"%s"' % token[1]
     return CATEGORY_DICT_REVERSE[token[0]]
 
 

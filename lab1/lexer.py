@@ -1,4 +1,4 @@
-import re, os, sys
+import re, os
 from enum import Enum
 from collections import defaultdict
 
@@ -11,6 +11,7 @@ class TokenType(Enum):
     STRING = 5
     OPERATOR = 6
     CHAR = 7
+
 
 class Token:
     def __init__(self, token_type, value):
@@ -38,6 +39,7 @@ class Token:
     def __eq__(self, other):
         return self.type == other.type and self.value == other.value
 
+
 class LexicalParser:
     """Define the keywords, delimiters, operators, etc."""
     _keywords = [
@@ -54,10 +56,10 @@ class LexicalParser:
 
     _number_pattern = re.compile(r"[-+]?[0-9]*\.?[0-9]+([eE][-+]?[0-9]+)?")
     _string_pattern = re.compile(r'"[^"]*[^\n]"')
-    _unfinished_string_pattern = re.compile(r'"[^"]*[\n]')
+    _unfinished_string_pattern = re.compile(r'"[^"]*\n')
     _identifier_pattern = re.compile(r"[a-zA-Z_][a-zA-Z_0-9]*")
     _char_pattern = re.compile(r"'.'")
-    _unfinished_char_pattern = re.compile(r"'.[\n]")
+    _unfinished_char_pattern = re.compile(r"'.\n")
     _new_line_pattern = re.compile('\n')
     _preprocessor_pattern = re.compile(r"#.*")
     _comment_pattern = re.compile(r"//.*")
@@ -89,32 +91,32 @@ class LexicalParser:
                 else:
                     self.tokens.append(Token(TokenType.OPERATOR, ch))
             elif ch == '"':
-                match = re.match(self._string_pattern, code[i-1:])
+                match = re.match(self._string_pattern, code[i - 1:])
                 if match:
                     self.tokens.append(Token(TokenType.STRING, match.group()))
                     i += len(match.group()) - 1
                 else:
-                    match = re.search('\n', code[i-1:])
+                    match = re.search('\n', code[i - 1:])
                     if match:
-                        print("Unfinished string: %s" % code[i-1:match.end()])
+                        print("Unfinished string: %s" % code[i - 1:match.end()])
                         i += match.end() - 1
             elif ch == "'":
-                match = re.match(self._char_pattern, code[i-1:])
+                match = re.match(self._char_pattern, code[i - 1:])
                 if match:
                     self.tokens.append(Token(TokenType.CHAR, match.group()))
                     i += len(match.group()) - 1
                 else:
-                    match = re.search('\n', code[i-1:])
+                    match = re.search('\n', code[i - 1:])
                     if match:
-                        print("Unfinished char: %s" % code[i-1:match.end()])
+                        print("Unfinished char: %s" % code[i - 1:match.end()])
                         i += match.end() - 1
             elif ch.isdigit():
-                match = re.match(self._number_pattern, code[i-1:])
+                match = re.match(self._number_pattern, code[i - 1:])
                 if match:
                     self.tokens.append(Token(TokenType.NUMBER, match.group()))
                     i += len(match.group()) - 1
             elif ch.isalpha() or ch == "_":
-                match = re.match(self._identifier_pattern, code[i-1:])
+                match = re.match(self._identifier_pattern, code[i - 1:])
                 if match:
                     word = match.group().lower()
                     if word in self._keywords:
@@ -126,7 +128,8 @@ class LexicalParser:
                 print("Unknown character: %s" % ch)
 
         return self.tokens
-    
+
+
 def generate_symbol_list(tokens):
     keyword_list = defaultdict(int)
     identifier_list = defaultdict(int)
@@ -154,6 +157,8 @@ def generate_symbol_list(tokens):
             for value in values:
                 f.write(f'{symbol_type} {value}\n')
     return output_file
+
+
 def lexer(input_file):
     with open(input_file, 'r') as f:
         code = f.read()
@@ -170,6 +175,7 @@ def lexer(input_file):
         for token in tokens:
             f.write(f'{token}\n')
     return output_file, sym_file
+
 
 if __name__ == '__main__':
     print(lexer('uploads/test.c'))

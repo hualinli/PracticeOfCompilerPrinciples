@@ -1,6 +1,4 @@
-import os
 import queue
-from .utils import *
 from .SLR1Analyzer import *
 from .lexicalAnalyzer import *
 

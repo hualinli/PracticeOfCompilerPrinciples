@@ -1,6 +1,7 @@
 import os
 from .table_generator import item_closure_list, production_list, AnalysisTable, V
-from .utils import EOF, EOF_TOKEN_CATEGORY, Grammar, fill_production, print_production, CATEGORY_DICT_REVERSE, token2str
+from .utils import EOF_TOKEN_CATEGORY, Grammar, fill_production, token2str
+
 
 def write_stack(input_list):
     output_list = []
@@ -15,6 +16,8 @@ def write_stack(input_list):
         else:
             output_list.append(item)
     return output_list
+
+
 def write_behavior(intput_tuple):
     output = f"{str(intput_tuple[0]).split('.')[-1]}" + " -> "
     for token_or_var in intput_tuple[1]:
@@ -25,6 +28,7 @@ def write_behavior(intput_tuple):
         else:
             output += "{ERROR}"
     return output
+
 
 def token_analysis(tokenReceiveCache, e):
     """
@@ -61,12 +65,14 @@ def token_analysis(tokenReceiveCache, e):
                 # 当分析器处于某一状态S, 且当前输入符号为a时，就以符号对(S, a)查LR分析表。
                 if (s.num, a) not in analysis_table.action:
                     # 如果分析表元素action[S, a]为空，则表示检测到了一个语法错误
-                    e.write("[ERROR] 检测到语法错误，状态%d在第%d个输入符号\"%s\"上的动作为空:" % (s.num, tokenReceiveCache.count, token2str(token)))
+                    e.write("[ERROR] 检测到语法错误，状态%d在第%d个输入符号\"%s\"上的动作为空:" % (
+                        s.num, tokenReceiveCache.count, token2str(token)))
                     # print_item_closure(s)
                     e.write("启动恢复程序(退栈直到可以处理为止)\n")
                     # 紧急方式的错误恢复
                     # 从栈顶开始退栈，直到符号栈栈顶是一个语法变量，且状态栈栈顶状态可以在该变量上转移为止。
-                    while token_or_var_stack[-1] not in V or (state_stack[-1].num, token_or_var_stack[-1]) not in analysis_table.goto.keys():
+                    while token_or_var_stack[-1] not in V or (
+                            state_stack[-1].num, token_or_var_stack[-1]) not in analysis_table.goto.keys():
                         token_or_var_stack.pop()
                         state_stack.pop()
                     # 丢弃若干输入符号，找到栈顶语法变量的第一个后继作为新的当前输入
