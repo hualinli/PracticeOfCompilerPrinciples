@@ -104,6 +104,23 @@
             font-size: 16px;
             margin: 0 10px;
         }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: Arial, sans-serif;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
     </style>
 </head>
 
@@ -131,7 +148,7 @@
                         {% endfor %}
                     </ul>
                 </div>
-                <div>
+                <!-- <div>
                     <h2>Symbol Stack:</h2>
                     <ul>
                         {% for line in symbol_stack %}
@@ -146,7 +163,19 @@
                         <li>{{ line }}</li>
                         {% endfor %}
                     </ul>
-                </div>
+                </div> -->
+                <table>
+                    <tr>
+                        <th>Symbol Stack</th>
+                        <th>Behavior</th>
+                    </tr>
+                    {% for i in range(symbol_stack|length) %}
+                    <tr>
+                        <td>{{ symbol_stack[i] }}</td>
+                        <td>{{ behavior[i] }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
             </div>
             <div>
                 <h2>Error:</h2>
@@ -167,6 +196,7 @@
             </form>
         </div>
         {% endif %}
+    </div>
 </body>
 
 </html>
