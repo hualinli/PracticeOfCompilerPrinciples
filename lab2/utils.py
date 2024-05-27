@@ -103,7 +103,7 @@ CATEGORY_DICT = {
     "true": 132,
     "false": 133,
     "string": 134,
-    "return": 135,
+    "return": 135
 }
 
 CATEGORY_DICT_REVERSE = dict((v, k) for k, v in CATEGORY_DICT.items())

@@ -1,7 +1,7 @@
-Value = ["" for _ in range(5)]
-Reserve = ["" for _ in range(60)]
-Operator = ["" for _ in range(230)]
-Boundary = ["" for _ in range(128)]
+Value = ["" for l in range(5)]
+Reserve = ["" for i in range(60)]
+Operator = ["" for j in range(230)]
+Boundary = ["" for k in range(128)]
 
 
 def init_value():
@@ -261,7 +261,6 @@ class LexicalScanner:
                 pointer += 1
         return self.result
 
-
 class NodeInfo:
     def __init__(self):
         self.name = ''
@@ -281,38 +280,51 @@ class StackNode:
         self.info = NodeInfo()
 
 
+# 将p1和p2指向的列表进行合并，指向合并后列表的指针
+def merge(list_1, list_2):
+    tmp = list_1.union(list_2)
+    return tmp
+
+
 class SemanticAnalyzer:
-    def __init__(self, new_start='S', point='.', sharp='$', acc='acc', log_level=0):
-        self.start = 'Program'
+    def __init__(self, start, new_start='S', point='.', sharp='$', acc='acc', log_level=0):
+        self.start = start
         self.productions = {
-            'Program': [['Function']],
-            'Parameter': [['DataType', '0', 'Action:allocateParam'], ['46']],
+            'Program': [['Header', 'Function']],
+            'Header': [['127', '47', '220', '48', '222', 'Header_'], ['null']],
+            'Header_': [['Header'], ['null']],
+            'Parameter': [['DataType', '0', 'Action:allocateParam', 'Parameter_'], ['DataType', '0', 'Action:allocateParam'], ['46']],
+            'Parameter_': [['123', 'Parameter'], ['null']],
             'Action:allocateParam': [['null', 'do:allocateParam']],
-            'ReturnType': [['2', 'do:passReturnType'], ['13', 'do:passReturnType'], ['24', 'do:passReturnType'],
-                           ['46', 'do:passReturnType']],
+            'ReturnType': [['2', 'do:passReturnType'], ['13', 'do:passReturnType'], ['24', 'do:passReturnType'], ['46', 'do:passReturnType']],
             'FunctionName': [['0', 'do:passFunctionName'], ['1']],
             'Function': [
                 ['ReturnType', 'FunctionName', 'Action:allocateFunc', '121', 'Parameter', '122', '125', 'FunctionBody',
                  '126', 'Function_']],
             'Action:allocateFunc': [['null', 'do:allocateFunc']],
             'Function_': [['Function'], ['null']],
+            # 改动
             'FunctionBody': [['VariableDef', 'ProcessStc', 'ReturnStc']],
-            'ReturnStc': [['33', '0', '124', 'do:returnVariable'], ['33', 'Num', '124', 'do:returnNum'], ['null']],
+            'ReturnStc': [['33', '0', '124', 'do:returnVariable'], ['33', 'Num', '124', 'do:returnNum']],
             'VariableDef': [['DataType', '0', 'Action:allocateVar', '124', 'VariableDef_']],
             'Action:allocateVar': [['null', 'do:allocateVar']],
             'VariableDef_': [['VariableDef'], ['null']],
             'DataType': [['2', 'do:typeInt'], ['24', 'do:typeFloat'], ['13', 'do:typeChar']],
             'ProcessStc': [['S', 'ProcessStc_']],
-            'S': [['AssignmentStc', '124'], ['JudgeStc'], ['LoopStc'], ['FunctionCall', '124']],
+            # 改动
+            'S': [['AssignmentStc', '124'], ['JudgeStc'], ['LoopStc']],
             'ProcessStc_': [['ProcessStc'], ['null']],
             'AssignmentStc': [['0', '226', 'C', 'do:passValueToVar']],
             'C': [['0', 'do:passVarValue'], ['Num', 'do:passNumValue'], ['Operate', 'do:passTmpValue']],
+            # 改动
             'Operate': [['0', 'Operator', 'Num', 'do:operateVarNum'], ['Num', 'Operator', 'Num', 'do:operateVarVar'],
+                        ['Num', 'Operator', '0', 'do:operateNumVar'], ['0', 'Operator', '0', 'do:operateNumNum'],
                         ['0', '211'],
                         ['0', '214']],
             'Operator': [['210', 'do:+'], ['213', 'do:-'], ['216', 'do:*'], ['218', 'do:/']],
             'JudgeStc': [['3', '121', 'Condition', '122', '125', 'Action:backPatchTrue', 'ProcessStc', '126',
-                          'Action:backPatchFalse', 'E']],
+                          'Action:backPatchFalse', 'E'],['3', '121', 'Condition', '122', '125', 'Action:backPatchTrue', 'ProcessStc', '126',
+                          'Action:backPatchFalse']],
             'Action:backPatchTrue': [['null', 'do:backPatchTrue']],
             'Action:backPatchFalse': [['null', 'do:backPatchFalse']],
             'E': [['4', '125', 'ProcessStc', '126', 'do:backPatchElse'], ['null']],
@@ -323,8 +335,8 @@ class SemanticAnalyzer:
             'JudgeOperator': [['225', 'do:=='], ['222', 'do:>'], ['220', 'do:<'],
                               ['223', 'do:>='], ['221', 'do:<='], ['224', 'do:!=']],
             'LoopStc': [
-                ['5', '121', 'Condition', '122', '125', 'Action:backPatchTrue', 'ProcessStc', '126', 'do:goBack']
-            ],
+                ['5', '121', 'Condition', '122', '125', 'Action:backPatchTrue', 'ProcessStc', '126', 'do:goBack']],
+            # 改动
             'FunctionCall': [['0', '226', 'FunctionName', '121', '0', '122'], ['FunctionName', 'Parameter']],
             'Num': [['300', 'do:assignInt'], ['301', 'do:assignFloat']]
         }
@@ -345,8 +357,8 @@ class SemanticAnalyzer:
         self.status_list = []
         terminal_symbols_ = self.terminal_symbols.copy()
         terminal_symbols_.add(self.sharp)
-        self.action = [{item: '' for item in terminal_symbols_} for _ in range(200)]
-        self.goto = [{item: '' for item in self.non_terminal_symbols} for _ in range(200)]
+        self.action = [{item: '' for item in terminal_symbols_} for i in range(200)]
+        self.goto = [{item: '' for item in self.non_terminal_symbols} for i in range(200)]
         self.build_analysis_table()
         self.offset = 0
         self.tmp_count = 0
@@ -455,6 +467,7 @@ class SemanticAnalyzer:
         old_production_set = production_set.copy()
         # 直到闭包不再增大为止
         while True:
+            # for J中每一个形如B  α.Aβ的项目
             for production in production_set:
                 right = production[1]
                 point_index = right.index(self.point)
@@ -464,10 +477,12 @@ class SemanticAnalyzer:
                     right.remove(self.point)
                     right.insert(point_index + 1, self.point)
                 else:
+                    # for G’中每一个形如Aγ的产生式 do
                     for production_ in self.productions[right[point_index + 1]]:
                         right_ = production_.copy()
                         right_.insert(0, self.point)
                         result = (right[point_index + 1], right_)
+                        # if A  .γ不在C中,将A  .γ加入J中
                         if result not in production_set:
                             production_set.append(result)
             if old_production_set == production_set:
@@ -554,8 +569,6 @@ class SemanticAnalyzer:
                 print('expect symbol: ', expects)
                 print('symbol location:', pointer)
                 print(code[:pointer + 1])
-                print('current status stack:', status_stack)
-                print('current symbol stack:', symbol_stack)
                 return False
             if action == self.acc:
                 return True
@@ -572,11 +585,15 @@ class SemanticAnalyzer:
                 left = self.naive_productions[action[1]][0]
                 right = self.naive_productions[action[1]][1]
                 for i in range(0, len(right)):
+                    tmp = symbol_stack[-1].symbol[0]
                     # 假如产生式右部符号不在符号栈中，那么有两种情况，该右部符号可以为空串，或该右部符号是一个动作，应当执行
                     if str(symbol_stack[-1].symbol[0]) != right[len(right) - i - 1]:
                         current_symbol = right[len(right) - i - 1]
                         if current_symbol[0] == 'd':
                             self.semantic_action(symbol_stack, current_symbol)
+                        # 该右部符号可以为空串，那么可以忽略该符号继续归约，但不要忘了，这个可推出空串非终结符归约时也有可能有具体动作！
+                        # elif current_symbol == 'null':
+                        #     status_stack.pop()
                         else:
                             raise Exception('文法有误！')
                     else:
@@ -605,14 +622,18 @@ class SemanticAnalyzer:
             else:
                 symbol_stack[-2].info.type = self.symbol_table[symbol_stack[-2].symbol[1]][0]
                 if symbol_stack[-12].info.type != symbol_stack[-2].info.type:
-                    print('variable type not match')
+                    if symbol_stack[-12].info.type == 'int' and symbol_stack[-2].info.type == 'float':
+                        print('WARNING: float to int')
+                    self.gen_code('return ' + symbol_stack[-12].info.type + '(' + symbol_stack[-2].symbol[1] + ')')                    
                 else:
                     self.gen_code('return ' + symbol_stack[-2].symbol[1])
         elif action == 'do:returnNum':
             if symbol_stack[-12].info.type != symbol_stack[-2].info.type:
-                print('variable type not match')
+                if symbol_stack[-12].info.type == 'int' and symbol_stack[-2].info.type == 'float':
+                    print('WARNING: float to int')
+                self.gen_code('return ' + symbol_stack[-12].info.type + '(' + str(symbol_stack[-2].info.val) + ')' )
             else:
-                self.gen_code('return ' + str(symbol_stack[-2].info.val))
+                self.gen_code('return ' + symbol_stack[-2].info.val)
         elif action == 'do:allocateVar':
             name = symbol_stack[-2].symbol[1]
             type = symbol_stack[-3].info.type
@@ -633,8 +654,12 @@ class SemanticAnalyzer:
                 print('undefined variable:' + symbol_stack[-3].symbol[1])
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
-                if symbol_stack[-1].info.type != symbol_stack[-3].info.type:
-                    print('variable type not match')
+                if symbol_stack[-1].info.type != "" and symbol_stack[-1].info.type != symbol_stack[-3].info.type:
+                    if symbol_stack[-1].info.type == 'int' and symbol_stack[-3].info.type == 'float':
+                        self.gen_code(symbol_stack[-3].symbol[1] + '=float(' + str(symbol_stack[-1].info.name) + ')')
+                    else:
+                        print('WARNING: float to int')
+                        self.gen_code(symbol_stack[-3].symbol[1] + '=int(' + str(symbol_stack[-1].info.name) + ')')
                 else:
                     symbol_stack[-3].info.val = symbol_stack[-1].info.val
                     self.symbol_table[symbol_stack[-3].symbol[1]] = (
@@ -654,26 +679,51 @@ class SemanticAnalyzer:
                 print('undefined variable:' + symbol_stack[-3].symbol[1])
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
-                if symbol_stack[-1].info.type != symbol_stack[-3].info.type:
-                    print('variable type not match')
-                else:
-                    self.tmp_count += 1
-                    self.gen_code(
-                        't' + str(self.tmp_count) + '=' + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name + str(
-                            symbol_stack[-1].info.val))
-        elif action == 'do:operateVarVar':
-            if symbol_stack[-3].symbol[1] not in self.symbol_table.keys() or symbol_stack[-1].symbol[1]:
-                print('undefined variable:' + symbol_stack[-3].symbol[1])
+                self.tmp_count += 1
+                self.gen_code(
+                    't' + str(self.tmp_count) + '=' + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name + str(
+                        symbol_stack[-1].info.val))
+        elif action == 'do:operateNumNum':
+            if symbol_stack[-3].symbol[1] not in self.symbol_table.keys() or symbol_stack[-1].symbol[1] not in self.symbol_table.keys():
+                print('undefined variable:' + str(symbol_stack[-3].symbol[1]))
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
                 symbol_stack[-1].info.type = self.symbol_table[symbol_stack[-1].symbol[1]][0]
                 if symbol_stack[-1].info.type != symbol_stack[-3].info.type:
-                    print('variable type not match')
+                    if symbol_stack[-3].info.type == 'int' and symbol_stack[-1].info.type == 'float':
+                        self.tmp_count += 1
+                        self.gen_code(
+                            't' + str(self.tmp_count) + '=float(' + symbol_stack[-3].symbol[1] + ')' + symbol_stack[
+                                -2].info.name + symbol_stack[-1].symbol[1])
+                    else:
+                        self.tmp_count += 1
+                        self.gen_code(
+                            't' + str(self.tmp_count) + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name + 'float(' + symbol_stack[-1].symbol[1] + ')')
                 else:
                     self.tmp_count += 1
                     self.gen_code(
                         't' + str(self.tmp_count) + '=' + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name +
                         symbol_stack[-1].symbol[1])
+        elif action == 'do:operateVarVar':
+            self.tmp_count += 1
+            self.gen_code('t' + str(self.tmp_count) + '=' + str(symbol_stack[-3].info.val) + symbol_stack[-2].info.name + str(symbol_stack[-1].info.val))
+        elif action == 'do:operateNumVar':
+            if symbol_stack[-1].symbol[1] not in self.symbol_table.keys():
+                print('undefined variable:' + symbol_stack[-1].symbol[1])
+            else:
+                symbol_stack[-1].info.type = self.symbol_table[symbol_stack[-1].symbol[1]][0]
+                if symbol_stack[-3].info.type != "" and symbol_stack[-1].info.type != symbol_stack[-3].info.type:
+                    if symbol_stack[-3].info.type == 'int' and symbol_stack[-1].info.type == 'float':
+                        self.tmp_count += 1
+                        self.gen_code(
+                            't' + str(self.tmp_count) + '=float(' + str(symbol_stack[-3].info.val) + ')' + symbol_stack[-2].info.name + symbol_stack[-1].symbol[1])
+                    else:
+                        self.tmp_count += 1
+                        self.gen_code(
+                            't' + str(self.tmp_count) + '=' + str(symbol_stack[-3].info.val) + symbol_stack[-2].info.name + 'float(' + symbol_stack[-1].symbol[1] + ')')
+                else:
+                    self.tmp_count += 1
+                    self.gen_code('t' + str(self.tmp_count) + '=' + str(symbol_stack[-3].info.val) + symbol_stack[-2].info.name + symbol_stack[-1].symbol[1])
         elif action == 'do:+':
             symbol_stack[-1].info.name = '+'
         elif action == 'do:-':
@@ -702,32 +752,26 @@ class SemanticAnalyzer:
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
                 symbol_stack[-1].info.type = self.symbol_table[symbol_stack[-1].symbol[1]][0]
-                if symbol_stack[-1].info.type != symbol_stack[-3].info.type:
-                    print('variable type not match')
-                else:
-                    self.gen_code(
-                        'if ' + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name + symbol_stack[-1].symbol[
-                            1] + ' goto')
-                    self.gen_code('goto ')
-                    current_cursor = len(self.code)
-                    symbol_stack[-3].info.quad = current_cursor - 2
-                    symbol_stack[-3].info.trueList.append(current_cursor - 2)
-                    symbol_stack[-3].info.falseList.append(current_cursor - 1)
+                self.gen_code(
+                    'if ' + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name + symbol_stack[-1].symbol[
+                        1] + ' goto ')
+                self.gen_code('goto ')
+                current_cursor = len(self.code)
+                symbol_stack[-3].info.quad = current_cursor - 2
+                symbol_stack[-3].info.trueList.append(current_cursor - 2)
+                symbol_stack[-3].info.falseList.append(current_cursor - 1)
         elif action == 'do:VarNum':
             if symbol_stack[-3].symbol[1] not in self.symbol_table.keys():
                 print('undefined variable:' + symbol_stack[-3].symbol[1])
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
-                if symbol_stack[-1].info.type != symbol_stack[-3].info.type:
-                    print('variable type not match')
-                else:
-                    self.gen_code('if ' + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name + str(
-                        symbol_stack[-1].info.val) + ' goto')
-                    self.gen_code('goto ')
-                    current_cursor = len(self.code)
-                    symbol_stack[-3].info.quad = current_cursor - 2
-                    symbol_stack[-3].info.trueList.append(current_cursor - 2)
-                    symbol_stack[-3].info.falseList.append(current_cursor - 1)
+                self.gen_code('if ' + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name + str(
+                    symbol_stack[-1].info.val) + ' goto ')
+                self.gen_code('goto ')
+                current_cursor = len(self.code)
+                symbol_stack[-3].info.quad = current_cursor - 2
+                symbol_stack[-3].info.trueList.append(current_cursor - 2)
+                symbol_stack[-3].info.falseList.append(current_cursor - 1)
         elif action == 'do:==':
             symbol_stack[-1].info.name = '=='
         elif action == 'do:>':
@@ -756,20 +800,24 @@ class SemanticAnalyzer:
     def gen_code(self, str):
         self.code.append(str)
 
+
+
     # 将i作为目标标号插入到p所指列表的各指令中
     def back_patch(self, list, addr):
         for item in list:
             self.code[item] += str(addr)
 
-    def output_code(self):
+    def output_code(self, output_file):
         code = ""
-        for i in range(len(self.code)):
-            code += str(i) + ':' + self.code[i] + '\n'
+        with open(output_file, 'w') as f:
+            for i in range(len(self.code)):
+                f.write(str(i) + ': ' + self.code[i] + '\n')
+                code += f'{str(i)}:{self.code[i]}\n'
         return code
 
 
 if __name__ == '__main__':
-    scanner = LexicalScanner('uploads/test.c')
-    analyzer = SemanticAnalyzer()
+    scanner = LexicalScanner('main2.c')
+    analyzer = SemanticAnalyzer('Program')
     print(analyzer.analyze_grammar(scanner.lexical_analysis()))
-    print(analyzer.output_code())
+    analyzer.output_code()

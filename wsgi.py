@@ -40,6 +40,7 @@ def read_symbols(file_path):
 
 @app.route('/')
 def index():
+    # 渲染模板
     return render_template('index.html')
 
 @app.route('/delete_files', methods=['POST'])
@@ -105,11 +106,9 @@ def lab3():
         code_file.save(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
         source_code = read_code(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
         scanner = LexicalScanner(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
-        analyzer = SemanticAnalyzer()
+        analyzer = SemanticAnalyzer('Program')
         result = analyzer.analyze_grammar(scanner.lexical_analysis())
-        codes = analyzer.output_code()
-        with open(os.path.join(OUTPUT_DIR, 'code.txt'), 'w') as f:
-            f.write(codes)
+        codes = analyzer.output_code(os.path.join(OUTPUT_DIR, 'code.txt'))
     return render_template('lab3.html', code=source_code, result_codes=codes.split('\n'), result=result)
 
 if __name__ == '__main__':
