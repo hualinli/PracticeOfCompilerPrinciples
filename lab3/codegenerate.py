@@ -551,7 +551,7 @@ class SemanticAnalyzer:
                 else:
                     self.goto[status_id][symbol] = id
 
-    def analyze_grammar(self, code):
+    def analyze_grammar(self, code, error_file):
         status_stack = [0]
         symbol_stack = [self.sharp]
         code.append((self.sharp, self.sharp))
@@ -561,14 +561,18 @@ class SemanticAnalyzer:
             action = self.action[status_stack[-1]][str(tmp)]
             null_action = self.action[status_stack[-1]]['null']
             if action == '' and null_action == '':
-                print('Grammar Exception when analyzing symbol:', code[pointer])
+                # print('Grammar Exception when analyzing symbol:', code[pointer])
+                error_file.write('Grammar Exception when analyzing symbol: ' + str(code[pointer]) + '\n')
                 expects = []
                 for key in self.action[status_stack[-1]].keys():
                     if self.action[status_stack[-1]][key] != '':
                         expects.append(key)
-                print('expect symbol: ', expects)
-                print('symbol location:', pointer)
-                print(code[:pointer + 1])
+                # print('expect symbol: ', expects)
+                error_file.write('expect symbol: ' + str(expects) + '\n')
+                # print('symbol location:', pointer)
+                error_file.write('symbol location: ' + str(pointer) + '\n')
+                # print(code[:pointer + 1])
+                error_file.write(str(code[:pointer + 1]) + '\n')
                 return False
             if action == self.acc:
                 return True
@@ -590,7 +594,7 @@ class SemanticAnalyzer:
                     if str(symbol_stack[-1].symbol[0]) != right[len(right) - i - 1]:
                         current_symbol = right[len(right) - i - 1]
                         if current_symbol[0] == 'd':
-                            self.semantic_action(symbol_stack, current_symbol)
+                            self.semantic_action(symbol_stack, current_symbol, error_file)
                         # 该右部符号可以为空串，那么可以忽略该符号继续归约，但不要忘了，这个可推出空串非终结符归约时也有可能有具体动作！
                         # elif current_symbol == 'null':
                         #     status_stack.pop()
@@ -606,7 +610,7 @@ class SemanticAnalyzer:
                 symbol_stack.append(symbol)
                 status_stack.append(self.goto[status_stack[-1]][left])
 
-    def semantic_action(self, symbol_stack, action):
+    def semantic_action(self, symbol_stack, action, error_file):
         if action == 'do:allocateParam':
             pass
         elif action == 'do:passFunctionName':
@@ -618,19 +622,22 @@ class SemanticAnalyzer:
             symbol_stack[-1].info.type = symbol_stack[-1].symbol[1]
         elif action == 'do:returnVariable':
             if symbol_stack[-2].symbol[1] not in self.symbol_table.keys():
-                print('undefined variable:' + symbol_stack[-3].symbol[1])
+                # print('undefined variable:' + symbol_stack[-3].symbol[1])
+                error_file.write('undefined variable:' + symbol_stack[-2].symbol[1] + '\n')
             else:
                 symbol_stack[-2].info.type = self.symbol_table[symbol_stack[-2].symbol[1]][0]
                 if symbol_stack[-12].info.type != symbol_stack[-2].info.type:
                     if symbol_stack[-12].info.type == 'int' and symbol_stack[-2].info.type == 'float':
-                        print('WARNING: float to int')
+                        # print('WARNING: float to int')
+                        error_file.write(f'WARNING: float to int, in {len(self.code)}\n')
                     self.gen_code('return ' + symbol_stack[-12].info.type + '(' + symbol_stack[-2].symbol[1] + ')')                    
                 else:
                     self.gen_code('return ' + symbol_stack[-2].symbol[1])
         elif action == 'do:returnNum':
             if symbol_stack[-12].info.type != symbol_stack[-2].info.type:
                 if symbol_stack[-12].info.type == 'int' and symbol_stack[-2].info.type == 'float':
-                    print('WARNING: float to int')
+                    # print('WARNING: float to int')
+                    error_file.write(f'WARNING: float to int, in {len(self.code)}\n')
                 self.gen_code('return ' + symbol_stack[-12].info.type + '(' + str(symbol_stack[-2].info.val) + ')' )
             else:
                 self.gen_code('return ' + symbol_stack[-2].info.val)
@@ -651,14 +658,16 @@ class SemanticAnalyzer:
             symbol_stack[-1].info.width = 1
         elif action == 'do:passValueToVar':
             if symbol_stack[-3].symbol[1] not in self.symbol_table.keys():
-                print('undefined variable:' + symbol_stack[-3].symbol[1])
+                # print('undefined variable:' + symbol_stack[-3].symbol[1])
+                error_file.write('undefined variable:' + symbol_stack[-3].symbol[1] + '\n')
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
                 if symbol_stack[-1].info.type != "" and symbol_stack[-1].info.type != symbol_stack[-3].info.type:
                     if symbol_stack[-1].info.type == 'int' and symbol_stack[-3].info.type == 'float':
                         self.gen_code(symbol_stack[-3].symbol[1] + '=float(' + str(symbol_stack[-1].info.name) + ')')
                     else:
-                        print('WARNING: float to int')
+                        # print('WARNING: float to int')
+                        error_file.write(f'WARNING: float to int, in {len(self.code)}\n')
                         self.gen_code(symbol_stack[-3].symbol[1] + '=int(' + str(symbol_stack[-1].info.name) + ')')
                 else:
                     symbol_stack[-3].info.val = symbol_stack[-1].info.val
@@ -676,7 +685,8 @@ class SemanticAnalyzer:
             symbol_stack[-1].info.name = 't' + str(self.tmp_count)
         elif action == 'do:operateVarNum':
             if symbol_stack[-3].symbol[1] not in self.symbol_table.keys():
-                print('undefined variable:' + symbol_stack[-3].symbol[1])
+                # print('undefined variable:' + symbol_stack[-3].symbol[1])
+                error_file.write('undefined variable:' + str(symbol_stack[-3].symbol[1]))
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
                 self.tmp_count += 1
@@ -685,7 +695,8 @@ class SemanticAnalyzer:
                         symbol_stack[-1].info.val))
         elif action == 'do:operateNumNum':
             if symbol_stack[-3].symbol[1] not in self.symbol_table.keys() or symbol_stack[-1].symbol[1] not in self.symbol_table.keys():
-                print('undefined variable:' + str(symbol_stack[-3].symbol[1]))
+                # print('undefined variable:' + str(symbol_stack[-3].symbol[1]))
+                error_file.write('undefined variable:' + str(symbol_stack[-3].symbol[1]))
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
                 symbol_stack[-1].info.type = self.symbol_table[symbol_stack[-1].symbol[1]][0]
@@ -709,7 +720,8 @@ class SemanticAnalyzer:
             self.gen_code('t' + str(self.tmp_count) + '=' + str(symbol_stack[-3].info.val) + symbol_stack[-2].info.name + str(symbol_stack[-1].info.val))
         elif action == 'do:operateNumVar':
             if symbol_stack[-1].symbol[1] not in self.symbol_table.keys():
-                print('undefined variable:' + symbol_stack[-1].symbol[1])
+                # print('undefined variable:' + symbol_stack[-1].symbol[1])
+                error_file.write('undefined variable:' + str(symbol_stack[-1].symbol[1]))
             else:
                 symbol_stack[-1].info.type = self.symbol_table[symbol_stack[-1].symbol[1]][0]
                 if symbol_stack[-3].info.type != "" and symbol_stack[-1].info.type != symbol_stack[-3].info.type:
@@ -746,9 +758,11 @@ class SemanticAnalyzer:
             self.back_patch(symbol_stack[-11].info.nextList, current_cursor)
         elif action == 'do:VarVar':
             if symbol_stack[-3].symbol[1] not in self.symbol_table.keys():
-                print('undefined variable:' + symbol_stack[-3].symbol[1])
+                # print('undefined variable:' + symbol_stack[-3].symbol[1])
+                error_file('undefined variable:' + symbol_stack[-3].symbol[1])
             elif symbol_stack[-1].symbol[1] not in self.symbol_table.keys():
-                print('undefined variable:' + symbol_stack[-1].symbol[1])
+                # print('undefined variable:' + symbol_stack[-1].symbol[1])
+                error_file('undefined variable:' + symbol_stack[-1].symbol[1])
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
                 symbol_stack[-1].info.type = self.symbol_table[symbol_stack[-1].symbol[1]][0]
@@ -762,7 +776,8 @@ class SemanticAnalyzer:
                 symbol_stack[-3].info.falseList.append(current_cursor - 1)
         elif action == 'do:VarNum':
             if symbol_stack[-3].symbol[1] not in self.symbol_table.keys():
-                print('undefined variable:' + symbol_stack[-3].symbol[1])
+                # print('undefined variable:' + symbol_stack[-3].symbol[1])
+                error_file.write('undefined variable:' + symbol_stack[-3].symbol[1])
             else:
                 symbol_stack[-3].info.type = self.symbol_table[symbol_stack[-3].symbol[1]][0]
                 self.gen_code('if ' + symbol_stack[-3].symbol[1] + symbol_stack[-2].info.name + str(

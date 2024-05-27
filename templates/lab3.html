@@ -122,6 +122,23 @@
                     </ul>
                 </div>
             </div>
+        
+            <div class="analyze-result">
+                <h2>Analyze Result:</h2>
+                <p>{{ result }}</p>
+            </div>
+
+            {% if error_message %}
+            <div class="error-messages">
+                <h2>Error Messages:</h2>
+                <ul>
+                    {% for error in error_message %}
+                    <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        
             <div class="download-buttons">
                 <a href="{{ url_for('download', filename='code.txt') }}">Download Code</a>
             </div>

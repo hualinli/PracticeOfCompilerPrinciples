@@ -101,15 +101,18 @@ def lab3():
     source_code = None
     codes = ""
     result = None
+    errors = ""
     if request.method == 'POST':
         code_file = request.files['code_file']
         code_file.save(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
         source_code = read_code(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
         scanner = LexicalScanner(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
         analyzer = SemanticAnalyzer('Program')
-        result = analyzer.analyze_grammar(scanner.lexical_analysis())
-        codes = analyzer.output_code(os.path.join(OUTPUT_DIR, 'code.txt'))
-    return render_template('lab3.html', code=source_code, result_codes=codes.split('\n'), result=result)
+        with open(os.path.join(OUTPUT_DIR, 'error.txt'), 'w') as e:
+            result = analyzer.analyze_grammar(scanner.lexical_analysis(), e)
+            codes = analyzer.output_code(os.path.join(OUTPUT_DIR, 'code.txt'))
+        errors = read_tokens(os.path.join(OUTPUT_DIR, 'error.txt'))
+    return render_template('lab3.html', code=source_code, result_codes=codes.split('\n'), result=result, error_message=errors)
 
 if __name__ == '__main__':
     app.run(debug=True)
