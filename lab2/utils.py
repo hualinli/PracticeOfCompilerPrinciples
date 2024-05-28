@@ -103,7 +103,6 @@ CATEGORY_DICT = {
     "true": 132,
     "false": 133,
     "string": 134,
-    "return": 135
 }
 
 CATEGORY_DICT_REVERSE = dict((v, k) for k, v in CATEGORY_DICT.items())
@@ -180,7 +179,7 @@ initial_production_list = [
         [Grammar.TYPE, (IDENTIFIER, 0), (25, 0), Grammar.FORM_PARAM, (26, 0), (29, 0),
          Grammar.FUNC, Grammar.RET_VAL, (30, 0)],
         [Grammar.TYPE, (IDENTIFIER, 0), (25, 0), (26, 0), (29, 0), Grammar.FUNC, (30, 0)]]),
-    (Grammar.RET_VAL, [[(135, 0), Grammar.VALUE, (4, 0)]]),
+    (Grammar.RET_VAL, [[(119, 0), Grammar.VALUE, (4, 0)]]),
     # 变量声明->类型 标识符
     (Grammar.VAR_DECLARE, [[Grammar.TYPE, (IDENTIFIER, 0)]]),
     # 形式参数->类型 标识符|类型 标识符 逗号 形式参数
@@ -236,7 +235,6 @@ def fill_production(production, pop_token):
     return filled_production
 
 
-
 def token2str(token):
     if token[0] in [1, 2, 3]:
         return str(token[1])
@@ -247,6 +245,3 @@ def token2str(token):
     if token[0] == 6:
         return '"%s"' % token[1]
     return CATEGORY_DICT_REVERSE[token[0]]
-
-
-

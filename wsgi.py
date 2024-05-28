@@ -3,8 +3,8 @@ from flask import Flask, redirect, render_template, request, send_file, url_for
 from lab1.lexer import lexer
 from lab2.parser import parser
 from lab3.codegenerate import *
-app = Flask(__name__)
 
+app = Flask(__name__)
 
 UPLOAD_DIR = 'uploads/'
 if not os.path.exists(UPLOAD_DIR):
@@ -12,14 +12,16 @@ if not os.path.exists(UPLOAD_DIR):
 OUTPUT_DIR = 'output/'
 app.config['UPLOAD_DIR'] = UPLOAD_DIR
 
+
 def read_code(file_path):
     """
     读取代码文件,添加行号
     """
     with open(file_path, 'r') as f:
         lines = f.readlines()
-    numbered_lines = ['{}.{}'.format(i+1, line) for i, line in enumerate(lines)]
+    numbered_lines = ['{}.{}'.format(i + 1, line) for i, line in enumerate(lines)]
     return '\n'.join(numbered_lines)
+
 
 def read_tokens(file_path):
     """
@@ -28,6 +30,7 @@ def read_tokens(file_path):
     with open(file_path, 'r') as f:
         tokens = f.read().splitlines()
     return tokens
+
 
 def read_symbols(file_path):
     """
@@ -43,6 +46,7 @@ def index():
     # 渲染模板
     return render_template('index.html')
 
+
 @app.route('/delete_files', methods=['POST'])
 def delete_files():
     # Delete all files in the uploads and outputs directories
@@ -52,10 +56,10 @@ def delete_files():
             os.remove(file_path)
     return redirect(url_for('index'))
 
+
 @app.route('/download/<filename>')
 def download(filename):
     return send_file(os.path.join(OUTPUT_DIR, filename), as_attachment=True)
-
 
 
 @app.route('/lab1', methods=['GET', 'POST'])
@@ -68,11 +72,11 @@ def lab1():
         source_code = read_code(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
         # 处理代码文件,生成tokens和symbols文件
         tokens_file, symbols_file = lexer(os.path.join(app.config['UPLOAD_DIR'], code_file.filename))
-        
+
         # 读取tokens和symbols文件
         tokens = read_tokens(tokens_file)
         symbols = read_symbols(symbols_file)
-        
+
         # 渲染模板,显示代码和结果
         return render_template('lab1.html', code=source_code, tokens=tokens, symbols=symbols)
     return render_template('lab1.html')
@@ -94,7 +98,9 @@ def lab2():
         behaviors = read_tokens(os.path.join(OUTPUT_DIR, 'behavior.txt'))
         symbols = read_tokens(os.path.join(OUTPUT_DIR, 'output.txt'))
         errors = read_tokens(os.path.join(OUTPUT_DIR, 'error.txt'))
-    return render_template('lab2.html', code=source_codes, tokens=tokens, behavior=behaviors, symbol_stack=symbols, error=errors)
+    return render_template('lab2.html', code=source_codes, tokens=tokens, behavior=behaviors, symbol_stack=symbols,
+                           error=errors)
+
 
 @app.route('/lab3', methods=['GET', 'POST'])
 def lab3():
@@ -112,7 +118,9 @@ def lab3():
             result = analyzer.analyze_grammar(scanner.lexical_analysis(), e)
             codes = analyzer.output_code(os.path.join(OUTPUT_DIR, 'code.txt'))
         errors = read_tokens(os.path.join(OUTPUT_DIR, 'error.txt'))
-    return render_template('lab3.html', code=source_code, result_codes=codes.split('\n'), result=result, error_message=errors)
+    return render_template('lab3.html', code=source_code, result_codes=codes.split('\n'), result=result,
+                           error_message=errors)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
