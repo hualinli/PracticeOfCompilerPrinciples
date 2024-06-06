@@ -328,9 +328,10 @@ class SemanticAnalyzer:
             'JudgeStc': [['3', '121', 'Condition', '122', '125', 'Action:backPatchTrue', 'ProcessStc', '126',
                           'Action:backPatchFalse', 'E'],
                          ['3', '121', 'Condition', '122', '125', 'Action:backPatchTrue', 'ProcessStc', '126',
-                          'Action:backPatchFalse']],
+                          'Action:backPatchNull']],
             'Action:backPatchTrue': [['null', 'do:backPatchTrue']],
             'Action:backPatchFalse': [['null', 'do:backPatchFalse']],
+            'Action:backPatchNull' : [['null', 'do:backPatchNull']],
             'E': [['4', '125', 'ProcessStc', '126', 'do:backPatchElse'], ['null']],
             'Condition': [['0', 'JudgeOperator', '0', 'do:VarVar'],
                           ['0', 'JudgeOperator', 'Num', 'do:VarNum'],
@@ -644,7 +645,7 @@ class SemanticAnalyzer:
                     error_file.write(f'WARNING: float to int, in {len(self.code)}\n')
                 self.gen_code('return ' + symbol_stack[-12].info.type + '(' + str(symbol_stack[-2].info.val) + ')')
             else:
-                self.gen_code('return ' + symbol_stack[-2].info.val)
+                self.gen_code('return ' + str(symbol_stack[-2].info.val))
         elif action == 'do:allocateVar':
             name = symbol_stack[-2].symbol[1]
             type = symbol_stack[-3].info.type
@@ -756,6 +757,11 @@ class SemanticAnalyzer:
             symbol_stack[-1].info.name = '*'
         elif action == 'do:/':
             symbol_stack[-1].info.name = '/'
+        elif action == 'do:backPatchNull':
+            # print(self.code)
+            current_cursor = len(self.code)
+            symbol_stack[-7].info.nextList.append(current_cursor)
+            self.back_patch(symbol_stack[-7].info.falseList, current_cursor)
         elif action == 'do:backPatchTrue':
             current_cursor = len(self.code)
             self.back_patch(symbol_stack[-4].info.trueList, current_cursor)
