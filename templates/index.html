@@ -13,6 +13,11 @@
             justify-content: center;
             height: 100vh;
             margin: 0;
+            background-image: url("{{ url_for('static', filename='images/background.jpg') }}");
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
         }
 
         h1 {
@@ -23,7 +28,7 @@
 
         h1 a {
             text-decoration: none;
-            color: #333;
+            color: #ffffff;
             transition: color 0.3s ease;
         }
 
